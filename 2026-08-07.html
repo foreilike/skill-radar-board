@@ -64,6 +64,35 @@
                  font-size: 12px; white-space: nowrap; font-weight: 400; }
     .state { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: #4e5969; font-size: 12px; }
     .none { padding: 28px; color: #86909c; text-align: center; }
+
+    @media (max-width: 760px) {
+      .shell { flex-direction: column; }
+      aside { width: auto; border-right: none; border-bottom: 1px solid #e5e6eb; padding: 14px 12px; }
+      aside .group { margin: 12px 0 6px; }
+      #categories, #maintenance { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+      #categories .nav-item, #maintenance .nav-item { white-space: nowrap; background: #f7f8fa; }
+      #categories .nav-item.active, #maintenance .nav-item.active { background: rgba(51,112,255,.12); }
+      main { padding: 14px 12px 28px; }
+      .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .stat { padding: 10px 12px; }
+      .stat .v { font-size: 18px; }
+      .toolbar { gap: 8px; }
+      input#search, select { width: 100%; }
+      .table-wrap { border: none; background: transparent; overflow-x: visible; }
+      table { min-width: 0; }
+      thead { display: none; }
+      tbody, tr, td { display: block; }
+      tr { background: #fff; border: 1px solid #e5e6eb; border-radius: 10px;
+           padding: 12px 14px; margin-bottom: 10px; }
+      tbody tr:hover { background: #fff; }
+      td { border: none; padding: 3px 0; text-align: left !important; }
+      td.num { text-align: left; }
+      td:first-child { display: none; }
+      td.name { min-width: 0; font-size: 15px; }
+      td.desc { min-width: 0; padding: 6px 0 8px; }
+      td[data-label]::before { content: attr(data-label) "："; color: #a9aeb8; font-size: 12px; }
+      td[data-label] { display: inline-block; margin-right: 14px; font-size: 13px; }
+    }
   </style>
 </head>
 <body>
@@ -139,6 +168,13 @@ const el = (tag, cls, text) => {
   const node = document.createElement(tag);
   if (cls) node.className = cls;
   if (text !== undefined) node.textContent = text;
+  return node;
+};
+
+// 窄屏没有表头，每格自带列名，靠 CSS 的 ::before 显示。
+const labelled = (tag, cls, text, label) => {
+  const node = el(tag, cls, text);
+  node.setAttribute('data-label', label);
   return node;
 };
 
@@ -219,20 +255,22 @@ function rowNode(row, index) {
   tr.appendChild(desc);
 
   const cat = el('td');
+  cat.setAttribute('data-label', '分类');
   cat.appendChild(el('span', 'pill', row.category));
   tr.appendChild(cat);
 
-  tr.appendChild(el('td', null, row.language || '—'));
-  tr.appendChild(el('td', 'num', row.stars.toLocaleString()));
+  tr.appendChild(labelled('td', null, row.language || '—', '语言'));
+  tr.appendChild(labelled('td', 'num', row.stars.toLocaleString(), '总 Star'));
 
-  const delta = el('td', 'num');
+  const delta = labelled('td', 'num', undefined, '今日增星');
   if (row.delta === null) delta.textContent = '—';
   else delta.appendChild(el('span', 'delta', '+' + row.delta));
   tr.appendChild(delta);
 
-  tr.appendChild(el('td', 'num', row.forks.toLocaleString()));
+  tr.appendChild(labelled('td', 'num', row.forks.toLocaleString(), 'Fork'));
 
   const st = el('td');
+  st.setAttribute('data-label', '最近更新');
   const wrap = el('div', 'state');
   wrap.appendChild(el('span', 'dot ' + row.maintenance));
   wrap.appendChild(el('span', null, row.pushed_at));
