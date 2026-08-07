@@ -45,7 +45,7 @@
     th.s:hover { color: #3370ff; }
     th.c-idx { width: 46px; }
     th.c-name { width: 210px; }
-    th.c-cat { width: 96px; }
+    th.c-cat { width: 118px; }
     th.c-lang { width: 96px; }
     th.c-num { width: 92px; }
     th.c-date { width: 122px; }
@@ -58,7 +58,8 @@
     td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .delta { color: #b45309; font-weight: 600; }
     .pill { display: inline-block; background: #f0f2ff; color: #3370ff; border-radius: 4px;
-            padding: 1px 8px; font-size: 12px; white-space: nowrap; }
+            padding: 1px 8px; font-size: 12px; white-space: nowrap; margin: 0 4px 3px 0; }
+    .pill.domain { background: #f0f9f0; color: #009a29; }
     .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
     .tags span { background: #f2f3f5; color: #86909c; border-radius: 4px; padding: 1px 6px;
                  font-size: 12px; white-space: nowrap; font-weight: 400; }
@@ -69,9 +70,9 @@
       .shell { flex-direction: column; }
       aside { width: auto; border-right: none; border-bottom: 1px solid #e5e6eb; padding: 14px 12px; }
       aside .group { margin: 12px 0 6px; }
-      #categories, #maintenance { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
-      #categories .nav-item, #maintenance .nav-item { white-space: nowrap; background: #f7f8fa; }
-      #categories .nav-item.active, #maintenance .nav-item.active { background: rgba(51,112,255,.12); }
+      #shapes, #domains, #maintenance { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+      #shapes .nav-item, #domains .nav-item, #maintenance .nav-item { white-space: nowrap; background: #f7f8fa; }
+      #shapes .nav-item.active, #domains .nav-item.active, #maintenance .nav-item.active { background: rgba(51,112,255,.12); }
       main { padding: 14px 12px 28px; }
       .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
       .stat { padding: 10px 12px; }
@@ -100,8 +101,10 @@
     <aside>
       <h1>skill-radar</h1>
       <p class="sub">GitHub Claude skills 日榜</p>
-      <p class="group">技能分类</p>
-      <div id="categories"></div>
+      <p class="group">形态</p>
+      <div id="shapes"></div>
+      <p class="group">领域</p>
+      <div id="domains"></div>
       <p class="group">维护状态</p>
       <div id="maintenance"></div>
     </aside>
@@ -138,7 +141,7 @@
               <th class="num c-idx">#</th>
               <th class="s c-name" data-key="full_name">仓库</th>
               <th>说明</th>
-              <th class="c-cat">分类</th>
+              <th class="c-cat">形态 · 领域</th>
               <th class="c-lang">语言</th>
               <th class="s num c-num" data-key="stars">总 Star</th>
               <th class="s num c-num" data-key="delta">今日增星</th>
@@ -152,17 +155,18 @@
       </div>
     </main>
   </div>
-  <script id="board-data" type="application/json">[{"full_name": "a/x", "url": "https://github.com/a/x", "description": "说明", "zh": "", "category": "应用", "language": "", "stars": 500, "delta": null, "forks": 0, "pushed_at": "2026-08-05", "maintenance": "持续更新", "topics": ["claude-skills"]}]</script>
-  <script id="all-data" type="application/json">[{"full_name": "a/x", "url": "https://github.com/a/x", "description": "说明", "zh": "", "category": "应用", "language": "", "stars": 500, "delta": null, "forks": 0, "pushed_at": "2026-08-05", "maintenance": "持续更新", "topics": ["claude-skills"]}]</script>
+  <script id="board-data" type="application/json">[{"full_name": "a/x", "url": "https://github.com/a/x", "description": "说明", "zh": "", "shape": "单个技能", "domain": "通用", "language": "", "stars": 500, "delta": null, "forks": 0, "pushed_at": "2026-08-05", "maintenance": "持续更新", "topics": ["claude-skills"]}]</script>
+  <script id="all-data" type="application/json">[{"full_name": "a/x", "url": "https://github.com/a/x", "description": "说明", "zh": "", "shape": "单个技能", "domain": "通用", "language": "", "stars": 500, "delta": null, "forks": 0, "pushed_at": "2026-08-05", "maintenance": "持续更新", "topics": ["claude-skills"]}]</script>
   <script>
 
 const DATA = {
   board: JSON.parse(document.getElementById('board-data').textContent),
   all: JSON.parse(document.getElementById('all-data').textContent),
 };
-const CATEGORIES = ['技能集合', '基建', '工具Agent', '应用'];
+const SHAPES = ["技能集合", "基建", "Agent框架", "模板脚手架", "单个技能"];
+const DOMAINS = ["写作", "设计", "PPT演示", "文档处理", "数据分析", "编程开发", "科研学术", "营销运营", "教育学习", "生活效率", "安全", "运维部署", "金融法务", "通用"];
 const STATES = ['持续更新', '轻量维护', '停更'];
-const state = { scope: 'board', category: '', maintenance: '', query: '', sort: 'delta', desc: true };
+const state = { scope: 'board', shape: '', domain: '', maintenance: '', query: '', sort: 'delta', desc: true };
 
 const el = (tag, cls, text) => {
   const node = document.createElement(tag);
@@ -181,10 +185,12 @@ const labelled = (tag, cls, text, label) => {
 function scoped() { return DATA[state.scope]; }
 
 function matches(row) {
-  if (state.category && row.category !== state.category) return false;
+  if (state.shape && row.shape !== state.shape) return false;
+  if (state.domain && row.domain !== state.domain) return false;
   if (state.maintenance && row.maintenance !== state.maintenance) return false;
   if (state.query) {
-    const hay = [row.full_name, row.description, row.zh, row.language, row.topics.join(' ')]
+    const hay = [row.full_name, row.description, row.zh, row.language,
+                 row.shape, row.domain, row.topics.join(' ')]
       .join(' ').toLowerCase();
     if (!hay.includes(state.query)) return false;
   }
@@ -206,20 +212,28 @@ function sorted(rows) {
   return copy;
 }
 
-function buildSidebar() {
+function buildGroup(id, key, allLabel, values) {
   const rows = scoped();
-  const box = document.getElementById('categories');
+  const box = document.getElementById(id);
   box.textContent = '';
-  const entries = [['', '全部技能', rows.length]].concat(
-    CATEGORIES.map(c => [c, c, rows.filter(r => r.category === c).length])
+  const entries = [['', allLabel, rows.length]].concat(
+    values
+      .map(v => [v, v, rows.filter(r => r[key] === v).length])
+      .filter(([, , count]) => count > 0 || state[key] !== '')
   );
   for (const [value, label, count] of entries) {
-    const item = el('div', 'nav-item' + (state.category === value ? ' active' : ''));
+    const item = el('div', 'nav-item' + (state[key] === value ? ' active' : ''));
     item.appendChild(el('span', null, label));
     item.appendChild(el('span', 'n', String(count)));
-    item.onclick = () => { state.category = value; render(); };
+    item.onclick = () => { state[key] = value; render(); };
     box.appendChild(item);
   }
+}
+
+function buildSidebar() {
+  const rows = scoped();
+  buildGroup('shapes', 'shape', '全部形态', SHAPES);
+  buildGroup('domains', 'domain', '全部领域', DOMAINS);
 
   const states = document.getElementById('maintenance');
   states.textContent = '';
@@ -256,7 +270,8 @@ function rowNode(row, index) {
 
   const cat = el('td');
   cat.setAttribute('data-label', '分类');
-  cat.appendChild(el('span', 'pill', row.category));
+  cat.appendChild(el('span', 'pill', row.shape));
+  cat.appendChild(el('span', 'pill domain', row.domain));
   tr.appendChild(cat);
 
   tr.appendChild(labelled('td', null, row.language || '—', '语言'));
