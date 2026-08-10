@@ -2,209 +2,326 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>skill-radar · 近 90 天新星榜</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>skill-radar · 近 90 天新星榜 · 2026-08-06</title>
   <style>
-    body { font-family: "Microsoft YaHei", system-ui, sans-serif; background: #faf8f4; color: #1f2937; margin: 0; padding: 32px; }
-    h1 { font-size: 22px; margin: 0 0 4px; }
-    .sub { color: #6b7280; font-size: 13px; margin-bottom: 24px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-    .card { background: #fff; border: 1px solid #ece7de; border-radius: 10px; padding: 16px 18px; }
-    .meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .heat { color: #b45309; font-weight: 600; font-size: 13px; }
-    .tag { background: #eef2ff; color: #4338ca; border-radius: 4px; padding: 2px 8px; font-size: 12px; }
-    h2 { font-size: 16px; margin: 0 0 8px; }
-    h2 a { color: #111827; text-decoration: none; }
-    h2 a:hover { text-decoration: underline; }
-    p { margin: 0 0 12px; font-size: 13px; line-height: 1.6; color: #4b5563; }
-    footer { font-size: 12px; color: #9ca3af; }
-    .empty { color: #6b7280; }
-    ul { line-height: 2; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Microsoft YaHei", -apple-system, "Segoe UI", system-ui, sans-serif;
+           background: #f5f6f7; color: #1d2129; font-size: 14px; }
+    .shell { display: flex; min-height: 100vh; }
+    aside { width: 216px; flex-shrink: 0; background: #fff; border-right: 1px solid #e5e6eb; padding: 18px 14px; }
+    aside h1 { font-size: 16px; margin: 0 0 2px; }
+    aside .sub { color: #86909c; font-size: 12px; margin: 0 0 18px; }
+    aside .group { color: #86909c; font-size: 12px; margin: 18px 0 6px; }
+    .nav-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px;
+                cursor: pointer; user-select: none; }
+    .nav-item:hover { background: #f2f3f5; }
+    .nav-item.active { background: rgba(51,112,255,.10); color: #3370ff; font-weight: 600; }
+    .nav-item .n { margin-left: auto; font-size: 12px; background: #f2f3f5; color: #4e5969;
+                   border-radius: 10px; padding: 0 7px; }
+    .nav-item.active .n { background: rgba(51,112,255,.18); color: #3370ff; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot.持续更新 { background: #00b42a; }
+    .dot.轻量维护 { background: #ff7d00; }
+    .dot.停更 { background: #c9cdd4; }
+    main { flex: 1; min-width: 0; padding: 20px 24px 32px; }
+    .head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .head h2 { font-size: 20px; margin: 0; }
+    .head .meta { color: #86909c; font-size: 13px; }
+    .head a { color: #3370ff; text-decoration: none; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+    .stat { background: #fff; border: 1px solid #e5e6eb; border-radius: 10px; padding: 12px 16px; }
+    .stat .v { font-size: 22px; font-weight: 600; }
+    .stat .k { color: #86909c; font-size: 12px; margin-top: 2px; }
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    input, select { font: inherit; border: 1px solid #e5e6eb; border-radius: 6px; padding: 6px 10px;
+                    background: #fff; color: inherit; outline-color: #3370ff; }
+    input#search { width: 280px; }
+    .table-wrap { background: #fff; border: 1px solid #e5e6eb; border-radius: 10px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #f2f3f5; vertical-align: top; }
+    th { background: #f7f8fa; font-weight: 500; color: #4e5969; white-space: nowrap; position: sticky; top: 0; }
+    th.s { cursor: pointer; }
+    th.s:hover { color: #3370ff; }
+    th.c-idx { width: 46px; }
+    th.c-name { width: 210px; }
+    th.c-cat { width: 118px; }
+    th.c-lang { width: 96px; }
+    th.c-num { width: 92px; }
+    th.c-date { width: 122px; }
+    tbody tr:hover { background: #fafbfc; }
+    td.name { min-width: 176px; overflow-wrap: break-word; }
+    td.name a { color: #1d2129; text-decoration: none; font-weight: 600; }
+    td.name a:hover { color: #3370ff; text-decoration: underline; }
+    td.desc { min-width: 250px; color: #4e5969; line-height: 1.55; }
+    td.desc .orig { color: #a9aeb8; font-size: 12px; margin-top: 3px; }
+    td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .delta { color: #b45309; font-weight: 600; }
+    .pill { display: inline-block; background: #f0f2ff; color: #3370ff; border-radius: 4px;
+            padding: 1px 8px; font-size: 12px; white-space: nowrap; margin: 0 4px 3px 0; }
+    .pill.domain { background: #f0f9f0; color: #009a29; }
+    .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .tags span { background: #f2f3f5; color: #86909c; border-radius: 4px; padding: 1px 6px;
+                 font-size: 12px; white-space: nowrap; font-weight: 400; }
+    .state { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: #4e5969; font-size: 12px; }
+    .none { padding: 28px; color: #86909c; text-align: center; }
+
+    @media (max-width: 760px) {
+      .shell { flex-direction: column; }
+      aside { width: auto; border-right: none; border-bottom: 1px solid #e5e6eb; padding: 14px 12px; }
+      aside .group { margin: 12px 0 6px; }
+      #shapes, #domains, #maintenance { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+      #shapes .nav-item, #domains .nav-item, #maintenance .nav-item { white-space: nowrap; background: #f7f8fa; }
+      #shapes .nav-item.active, #domains .nav-item.active, #maintenance .nav-item.active { background: rgba(51,112,255,.12); }
+      main { padding: 14px 12px 28px; }
+      .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .stat { padding: 10px 12px; }
+      .stat .v { font-size: 18px; }
+      .toolbar { gap: 8px; }
+      input#search, select { width: 100%; }
+      .table-wrap { border: none; background: transparent; overflow-x: visible; }
+      table { min-width: 0; }
+      thead { display: none; }
+      tbody, tr, td { display: block; }
+      tr { background: #fff; border: 1px solid #e5e6eb; border-radius: 10px;
+           padding: 12px 14px; margin-bottom: 10px; }
+      tbody tr:hover { background: #fff; }
+      td { border: none; padding: 3px 0; text-align: left !important; }
+      td.num { text-align: left; }
+      td:first-child { display: none; }
+      td.name { min-width: 0; font-size: 15px; }
+      td.desc { min-width: 0; padding: 6px 0 8px; }
+      td[data-label]::before { content: attr(data-label) "："; color: #a9aeb8; font-size: 12px; }
+      td[data-label] { display: inline-block; margin-right: 14px; font-size: 13px; }
+    }
   </style>
 </head>
 <body>
-  <h1>skill-radar · 近 90 天新星榜</h1>
-  <p class="sub">2026-08-06 · 共 30 条 · <a href="index.html">全部日期</a></p>
-  <div class="grid">
-    <article class="card">
-      <div class="meta"><span class="heat">97049 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/DietrichGebert/ponytail" target="_blank" rel="noreferrer">DietrichGebert/ponytail</a></h2>
-      <p>Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.</p>
-      <footer>总星 97049 · 最近更新 2026-07-15</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">19270 星</span><span class="tag">工具Agent</span></div>
-      <h2><a href="https://github.com/alibaba/open-code-review" target="_blank" rel="noreferrer">alibaba/open-code-review</a></h2>
-      <p>Fast, efficient, battle-tested at Alibaba&#x27;s scale. Hybrid architecture code review tool: deterministic pipelines + LLM Agent, precise line-level comments, built-in multi-language ruleset (NPE, thread-safety, XSS, SQL injection), OpenAI &amp; Anthropic compatible.</p>
-      <footer>总星 19270 · 最近更新 2026-08-06</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">17417 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/ayghri/i-have-adhd" target="_blank" rel="noreferrer">ayghri/i-have-adhd</a></h2>
-      <p>A skill to stop your coding agent from burying the answer. ADHD-friendly output.</p>
-      <footer>总星 17417 · 最近更新 2026-08-05</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">15672 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/microsoft/SkillOpt" target="_blank" rel="noreferrer">microsoft/SkillOpt</a></h2>
-      <p>SkillOpt is a text-space optimizer that trains reusable natural-language skills for frozen LLM agents through trajectory-driven edits, validation-gated updates, and deployable best_skill.md artifacts.</p>
-      <footer>总星 15672 · 最近更新 2026-08-06</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">8107 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/nexu-io/html-anything" target="_blank" rel="noreferrer">nexu-io/html-anything</a></h2>
-      <p>✨ The agentic HTML editor — your local AI agent writes the HTML, you ship it. 🚀 75 Skills × 9 Surfaces (magazine · deck · poster · XHS / tweet · prototype · data report · Hyperframes) 🛡️ Sandboxed preview · 📤 1-click to WeChat / X / Zhihu / HTML / PNG 🔑 Zero API key — Claude Code / Cursor / Codex / Gemini / Copilot / OpenCode / Qwen / Aider.</p>
-      <footer>总星 8107 · 最近更新 2026-07-28</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">3662 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/Vincentwei1021/video-shotcraft" target="_blank" rel="noreferrer">Vincentwei1021/video-shotcraft</a></h2>
-      <p>AI video skill for Claude Code &amp; Codex — cinematic product videos with Remotion: 106 shot recipe cards, 161 motion previews, a production-ready template</p>
-      <footer>总星 3662 · 最近更新 2026-08-05</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">3301 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/inkeep/open-knowledge" target="_blank" rel="noreferrer">inkeep/open-knowledge</a></h2>
-      <p>Beautiful, AI-native markdown IDE and LLM wiki</p>
-      <footer>总星 3301 · 最近更新 2026-08-06</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">3060 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/JimLiu/baoyu-design" target="_blank" rel="noreferrer">JimLiu/baoyu-design</a></h2>
-      <p>Run Claude Design locally as an Agent Skill — Cursor, Claude Code &amp; more. Produce polished UI mockups, prototypes, decks &amp; wireframes as self-contained HTML, without claude.ai/design. Best with Opus 4.8.</p>
-      <footer>总星 3060 · 最近更新 2026-07-30</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">2970 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/Forward-Future/loopy" target="_blank" rel="noreferrer">Forward-Future/loopy</a></h2>
-      <p>A library of practical AI-agent loops and an installable skill for finding, adapting, and designing repeatable agent workflows.</p>
-      <footer>总星 2970 · 最近更新 2026-07-26</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">2613 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/zLanqing/codex-claude-academic-skills" target="_blank" rel="noreferrer">zLanqing/codex-claude-academic-skills</a></h2>
-      <p>本仓库包含三个面向学术科研人员的Skills，覆盖从文献阅读、论文写作到科学计算的完整研究工作流。office-academic-skill 负责论文阅读报告与学术 PPT/Word 文档生成；research-writing-skill 提供论文写作、润色与审稿回复辅助；scientific-toolkit-skill 整合 MATLAB/Python 科学计算与期刊级图表生成。三个 Skill 专为中文科研用户设计，可在 Claude Code 和 codex 中一键调用。</p>
-      <footer>总星 2613 · 最近更新 2026-05-14</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">2190 星</span><span class="tag">基建</span></div>
-      <h2><a href="https://github.com/DenisSergeevitch/agents-best-practices" target="_blank" rel="noreferrer">DenisSergeevitch/agents-best-practices</a></h2>
-      <p>Provider-neutral Agent Skill for Codex, Claude Code, and agentic harness design.</p>
-      <footer>总星 2190 · 最近更新 2026-06-29</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">2151 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/Sahir619/fable-method" target="_blank" rel="noreferrer">Sahir619/fable-method</a></h2>
-      <p>The Fable Workflow: how Claude Fable 5 worked, distilled into skills any model can run, with the eval that keeps it honest. Think / act / prove.</p>
-      <footer>总星 2151 · 最近更新 2026-07-15</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">2037 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/microsoft/skill-recorder" target="_blank" rel="noreferrer">microsoft/skill-recorder</a></h2>
-      <p>Desktop app that records your on-screen work session and uses the GitHub Copilot CLI to reconstruct it as an intent + ordered steps, then builds a reusable Skill or Automation for Microsoft Scout, Microsoft Copilot Cowork, or Copilot Studio.</p>
-      <footer>总星 2037 · 最近更新 2026-08-06</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">1899 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/JuneYaooo/nihaisha-nishi-tcm" target="_blank" rel="noreferrer">JuneYaooo/nihaisha-nishi-tcm</a></h2>
-      <p>倪海厦中医课程资料的 Agent Skill：支持课程检索、方证穴位辨析、学习笔记整理与板书截图证据索引。 |  An Agent Skill for Ni Haisha TCM course study, formula-pattern lookup, acupoint reference, and screenshot evidence indexing.</p>
-      <footer>总星 1899 · 最近更新 2026-08-04</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">1668 星</span><span class="tag">基建</span></div>
-      <h2><a href="https://github.com/Stack-Cairn/LiveAgent" target="_blank" rel="noreferrer">Stack-Cairn/LiveAgent</a></h2>
-      <p>A fully functional AI Agent desktop client that supports Webui access and can be creatively customized and expanded!</p>
-      <footer>总星 1668 · 最近更新 2026-08-06</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">1602 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/plannotator/effective-html" target="_blank" rel="noreferrer">plannotator/effective-html</a></h2>
-      <p>Agent skills for useful HTML artifacts, wireframes, interactive prototypes, plans, and diagrams.</p>
-      <footer>总星 1602 · 最近更新 2026-08-03</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">1526 星</span><span class="tag">基建</span></div>
-      <h2><a href="https://github.com/Kaelio/ktx" target="_blank" rel="noreferrer">Kaelio/ktx</a></h2>
-      <p>ktx is an executable context layer for data and analytics agents 🐙 Allow Claude Code, Codex, or other AI agents to query analytical databases accurately and with full context of your company</p>
-      <footer>总星 1526 · 最近更新 2026-07-19</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">1426 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/Klotzkette/claude-fuer-deutsches-recht" target="_blank" rel="noreferrer">Klotzkette/claude-fuer-deutsches-recht</a></h2>
-      <p>⚠️ Experimentelle Skill-Sammlung für deutsches Recht (Arbeits-, Gesellschafts-, Insolvenz-, Datenschutz-, Prozessrecht u.a.) – inzwischen verbessert und im Alltag getestet, aber weiterhin Experiment. Bitte selber ausprobieren, Issues/PRs willkommen! Keine Rechtsberatung. Mandatsgeheimnis (§§ 203/204 StGB, § 43e BRAO), DSGVO, US-Transfer, KI-VO &amp; Co</p>
-      <footer>总星 1426 · 最近更新 2026-08-05</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">1030 星</span><span class="tag">工具Agent</span></div>
-      <h2><a href="https://github.com/zhnt/loushang" target="_blank" rel="noreferrer">zhnt/loushang</a></h2>
-      <p>AI-native agent harness for coding workflows by python: multi-model LLM orchestration, stateful sessions, tool governance,   traceable delivery, and provider routing for GPT, Claude, DeepSeek, Qwen, Kimi, GLM, and MiniMax.</p>
-      <footer>总星 1030 · 最近更新 2026-08-05</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">824 星</span><span class="tag">工具Agent</span></div>
-      <h2><a href="https://github.com/Prism-Shadow/penguin-harness" target="_blank" rel="noreferrer">Prism-Shadow/penguin-harness</a></h2>
-      <p>🐧 Automated Agent Builder. Use DeepSeek or GPT to Create Self-Evolving Agents in One Click</p>
-      <footer>总星 824 · 最近更新 2026-08-05</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">816 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/mrtooher/fable-mode" target="_blank" rel="noreferrer">mrtooher/fable-mode</a></h2>
-      <p>A Claude skill that activates Fable-style agentic behavior: explicit multi-stage planning, sub-agent delegation, and self-verification.</p>
-      <footer>总星 816 · 最近更新 2026-07-10</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">694 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/amElnagdy/delegate-skills" target="_blank" rel="noreferrer">amElnagdy/delegate-skills</a></h2>
-      <p>Delegate a coding task to a separate coding agent CLI, review the diff, land the commit yourself — one per implementer.</p>
-      <footer>总星 694 · 最近更新 2026-08-05</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">693 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/jwangkun/claude-for-financial-services-cn" target="_blank" rel="noreferrer">jwangkun/claude-for-financial-services-cn</a></h2>
-      <p> 63 个 Claude Skills，为 A 股金融从业者而生  基于 Anthropic 官方 claude-for-financial-services 深度适配国内市场，现已开源。</p>
-      <footer>总星 693 · 最近更新 2026-06-09</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">687 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/MageByte-Zero/spec-superflow" target="_blank" rel="noreferrer">MageByte-Zero/spec-superflow</a></h2>
-      <p>源码级融合 OpenSpec 规划引擎 + Superpowers 执行纪律的 AI 编程工作流插件。17 平台支持，9 skills，Spec-first，契约驱动。</p>
-      <footer>总星 687 · 最近更新 2026-08-04</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">677 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/dongshuyan/compass-skills" target="_blank" rel="noreferrer">dongshuyan/compass-skills</a></h2>
-      <p>司南：个性化 AI 任务总控 Skills 系统 /COMPASS: Personal Alignment Skills OS for AI Agents</p>
-      <footer>总星 677 · 最近更新 2026-07-31</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">670 星</span><span class="tag">技能集合</span></div>
-      <h2><a href="https://github.com/agiwhitelist/auteur" target="_blank" rel="noreferrer">agiwhitelist/auteur</a></h2>
-      <p>The Claude Code skill that directs a website like a film. Commit-sheet, generated assets, build, and an executable anti-slop linter that gates every ship.</p>
-      <footer>总星 670 · 最近更新 2026-08-05</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">626 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/aldegad/sprite-gen" target="_blank" rel="noreferrer">aldegad/sprite-gen</a></h2>
-      <p>Generate clean 2D game sprites &amp; animation atlases — component-row pipeline: state rows, alpha cleanup, frame extraction, runtime atlases. Codex/Claude skill.</p>
-      <footer>总星 626 · 最近更新 2026-07-31</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">591 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/0xwilliamortiz/ponytail-improved" target="_blank" rel="noreferrer">0xwilliamortiz/ponytail-improved</a></h2>
-      <p>Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.</p>
-      <footer>总星 591 · 最近更新 2026-08-04</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">580 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/worldwonderer/novel-to-game" target="_blank" rel="noreferrer">worldwonderer/novel-to-game</a></h2>
-      <p>Agent Skills that turn novels into source-grounded, fully playable games for Claude Code, Codex, and Kimi Code(K3).</p>
-      <footer>总星 580 · 最近更新 2026-08-05</footer>
-    </article>
-    <article class="card">
-      <div class="meta"><span class="heat">578 星</span><span class="tag">应用</span></div>
-      <h2><a href="https://github.com/0xwilliamortiz/humanizer-cli" target="_blank" rel="noreferrer">0xwilliamortiz/humanizer-cli</a></h2>
-      <p>33 ways to spot AI-written text, right in your terminal. Before/after examples, draft checker, zero dependencies.</p>
-      <footer>总星 578 · 最近更新 2026-08-04</footer>
-    </article>
+  <div class="shell">
+    <aside>
+      <h1>skill-radar</h1>
+      <p class="sub">GitHub Claude skills 日榜</p>
+      <p class="group">形态</p>
+      <div id="shapes"></div>
+      <p class="group">领域</p>
+      <div id="domains"></div>
+      <p class="group">维护状态</p>
+      <div id="maintenance"></div>
+    </aside>
+    <main>
+      <div class="head">
+        <h2>近 90 天新星榜</h2>
+        <span class="meta">2026-08-06 · <span id="count"></span></span>
+        <span class="meta"><a href="index.html">全部日期</a></span>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="v">1</div><div class="k">今日上榜</div></div>
+        <div class="stat"><div class="v">1</div><div class="k">在库仓库</div></div>
+        <div class="stat"><div class="v">500</div><div class="k">在库总 Star</div></div>
+        <div class="stat"><div class="v">+0</div><div class="k">今日增星合计</div></div>
+      </div>
+      <div class="toolbar">
+        <input id="search" type="text" placeholder="搜索仓库名、说明、语言、标签…">
+        <select id="scope">
+          <option value="board">今日上榜 1 个</option>
+          <option value="all">全部在库 1 个</option>
+        </select>
+        <select id="sort">
+          <option value="delta:desc">今日增星 高→低</option>
+          <option value="stars:desc">总 Star 高→低</option>
+          <option value="forks:desc">Fork 高→低</option>
+          <option value="pushed_at:desc">最近更新</option>
+          <option value="full_name:asc">名称 A→Z</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="num c-idx">#</th>
+              <th class="s c-name" data-key="full_name">仓库</th>
+              <th>说明</th>
+              <th class="c-cat">形态 · 领域</th>
+              <th class="c-lang">语言</th>
+              <th class="s num c-num" data-key="stars">总 Star</th>
+              <th class="s num c-num" data-key="delta">今日增星</th>
+              <th class="s num c-num" data-key="forks">Fork</th>
+              <th class="s c-date" data-key="pushed_at">最近更新</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="none" id="none" style="display:none">没有符合条件的项目。</div>
+      </div>
+    </main>
   </div>
+  <script id="board-data" type="application/json">[{"full_name": "a/x", "url": "https://github.com/a/x", "description": "a skill pack", "zh": "一个技能包", "shape": "单个技能", "domain": "通用", "language": "", "stars": 500, "delta": null, "forks": 0, "pushed_at": "2026-08-05", "maintenance": "持续更新", "topics": ["claude-skills"]}]</script>
+  <script id="all-data" type="application/json">[{"full_name": "a/x", "url": "https://github.com/a/x", "description": "a skill pack", "zh": "一个技能包", "shape": "单个技能", "domain": "通用", "language": "", "stars": 500, "delta": null, "forks": 0, "pushed_at": "2026-08-05", "maintenance": "持续更新", "topics": ["claude-skills"]}]</script>
+  <script>
+
+const DATA = {
+  board: JSON.parse(document.getElementById('board-data').textContent),
+  all: JSON.parse(document.getElementById('all-data').textContent),
+};
+const SHAPES = ["技能集合", "基建", "Agent框架", "模板脚手架", "单个技能"];
+const DOMAINS = ["写作", "设计", "PPT演示", "文档处理", "数据分析", "编程开发", "科研学术", "营销运营", "教育学习", "生活效率", "安全", "运维部署", "金融法务", "通用"];
+const STATES = ['持续更新', '轻量维护', '停更'];
+const state = { scope: 'board', shape: '', domain: '', maintenance: '', query: '', sort: 'delta', desc: true };
+
+const el = (tag, cls, text) => {
+  const node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (text !== undefined) node.textContent = text;
+  return node;
+};
+
+// 窄屏没有表头，每格自带列名，靠 CSS 的 ::before 显示。
+const labelled = (tag, cls, text, label) => {
+  const node = el(tag, cls, text);
+  node.setAttribute('data-label', label);
+  return node;
+};
+
+function scoped() { return DATA[state.scope]; }
+
+function matches(row) {
+  if (state.shape && row.shape !== state.shape) return false;
+  if (state.domain && row.domain !== state.domain) return false;
+  if (state.maintenance && row.maintenance !== state.maintenance) return false;
+  if (state.query) {
+    const hay = [row.full_name, row.description, row.zh, row.language,
+                 row.shape, row.domain, row.topics.join(' ')]
+      .join(' ').toLowerCase();
+    if (!hay.includes(state.query)) return false;
+  }
+  return true;
+}
+
+function sorted(rows) {
+  const key = state.sort;
+  const copy = rows.slice();
+  copy.sort((a, b) => {
+    let av = a[key], bv = b[key];
+    if (key === 'delta' || key === 'stars' || key === 'forks') {
+      av = av === null ? -1 : av; bv = bv === null ? -1 : bv;
+      return state.desc ? bv - av : av - bv;
+    }
+    av = String(av || ''); bv = String(bv || '');
+    return state.desc ? bv.localeCompare(av) : av.localeCompare(bv);
+  });
+  return copy;
+}
+
+function buildGroup(id, key, allLabel, values) {
+  const rows = scoped();
+  const box = document.getElementById(id);
+  box.textContent = '';
+  const entries = [['', allLabel, rows.length]].concat(
+    values
+      .map(v => [v, v, rows.filter(r => r[key] === v).length])
+      .filter(([, , count]) => count > 0 || state[key] !== '')
+  );
+  for (const [value, label, count] of entries) {
+    const item = el('div', 'nav-item' + (state[key] === value ? ' active' : ''));
+    item.appendChild(el('span', null, label));
+    item.appendChild(el('span', 'n', String(count)));
+    item.onclick = () => { state[key] = value; render(); };
+    box.appendChild(item);
+  }
+}
+
+function buildSidebar() {
+  const rows = scoped();
+  buildGroup('shapes', 'shape', '全部形态', SHAPES);
+  buildGroup('domains', 'domain', '全部领域', DOMAINS);
+
+  const states = document.getElementById('maintenance');
+  states.textContent = '';
+  const stateEntries = [['', '全部状态']].concat(STATES.map(s => [s, s]));
+  for (const [value, label] of stateEntries) {
+    const item = el('div', 'nav-item' + (state.maintenance === value ? ' active' : ''));
+    if (value) item.appendChild(el('span', 'dot ' + value));
+    item.appendChild(el('span', null, label));
+    if (value) item.appendChild(el('span', 'n', String(rows.filter(r => r.maintenance === value).length)));
+    item.onclick = () => { state.maintenance = value; render(); };
+    states.appendChild(item);
+  }
+}
+
+function rowNode(row, index) {
+  const tr = el('tr');
+  tr.appendChild(el('td', 'num', String(index + 1)));
+
+  const name = el('td', 'name');
+  const link = el('a', null, row.full_name);
+  link.href = row.url; link.target = '_blank'; link.rel = 'noreferrer';
+  name.appendChild(link);
+  if (row.topics.length) {
+    const tagBox = el('div', 'tags');
+    for (const topic of row.topics.slice(0, 3)) tagBox.appendChild(el('span', null, topic));
+    name.appendChild(tagBox);
+  }
+  tr.appendChild(name);
+
+  const desc = el('td', 'desc');
+  desc.appendChild(el('div', null, row.zh || row.description || '（无说明）'));
+  if (row.zh && row.description) desc.appendChild(el('div', 'orig', row.description));
+  tr.appendChild(desc);
+
+  const cat = el('td');
+  cat.setAttribute('data-label', '分类');
+  cat.appendChild(el('span', 'pill', row.shape));
+  cat.appendChild(el('span', 'pill domain', row.domain));
+  tr.appendChild(cat);
+
+  tr.appendChild(labelled('td', null, row.language || '—', '语言'));
+  tr.appendChild(labelled('td', 'num', row.stars.toLocaleString(), '总 Star'));
+
+  const delta = labelled('td', 'num', undefined, '今日增星');
+  if (row.delta === null) delta.textContent = '—';
+  else delta.appendChild(el('span', 'delta', '+' + row.delta));
+  tr.appendChild(delta);
+
+  tr.appendChild(labelled('td', 'num', row.forks.toLocaleString(), 'Fork'));
+
+  const st = el('td');
+  st.setAttribute('data-label', '最近更新');
+  const wrap = el('div', 'state');
+  wrap.appendChild(el('span', 'dot ' + row.maintenance));
+  wrap.appendChild(el('span', null, row.pushed_at));
+  st.appendChild(wrap);
+  tr.appendChild(st);
+  return tr;
+}
+
+function render() {
+  buildSidebar();
+  const rows = sorted(scoped().filter(matches));
+  const body = document.getElementById('rows');
+  body.textContent = '';
+  rows.forEach((row, i) => body.appendChild(rowNode(row, i)));
+  document.getElementById('count').textContent = rows.length + ' 条';
+  document.getElementById('none').style.display = rows.length ? 'none' : 'block';
+}
+
+document.getElementById('search').oninput = (e) => {
+  state.query = e.target.value.trim().toLowerCase(); render();
+};
+document.getElementById('scope').onchange = (e) => { state.scope = e.target.value; render(); };
+document.getElementById('sort').onchange = (e) => {
+  const [key, dir] = e.target.value.split(':');
+  state.sort = key; state.desc = dir === 'desc'; render();
+};
+document.querySelectorAll('th.s').forEach(th => {
+  th.onclick = () => {
+    const key = th.dataset.key;
+    state.desc = state.sort === key ? !state.desc : true;
+    state.sort = key;
+    render();
+  };
+});
+render();
+
+  </script>
 </body>
 </html>
